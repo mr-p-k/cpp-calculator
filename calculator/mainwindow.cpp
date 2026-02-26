@@ -19,7 +19,12 @@ MainWindow::~MainWindow() {
 void MainWindow::SetText(const QString& text) {
     input_number_ = NormalizeNumber(text);
     active_number_ = input_number_.toDouble();
+
     ui->l_result->setText(input_number_);
+
+    if (current_operation_ == Operation::NO_OPERATION) {
+        ui->l_formula->setText("");
+    }
 }
 
 void MainWindow::AddText(const QString& suffix) {
@@ -87,16 +92,29 @@ void MainWindow::on_b_dot_clicked() {
 }
 
 void MainWindow::on_b_plusminus_clicked() {
+    if (active_number_ == 0 || std::isnan(active_number_)) {
+        return;
+    }
+
+    if (input_number_.isEmpty()) {
+        input_number_ = QString::number(active_number_);
+    }
+
     if (input_number_.startsWith('-')) {
         SetText(input_number_.mid(1));
     } else {
-        SetText("-" + input_number_);
+        SetText(QChar('-') + input_number_);
     }
 }
 
 void MainWindow::on_b_backspace_clicked() {
+    if (input_number_ == "0") {
+        return;
+    }
+
     if (input_number_.size() > 0) {
         input_number_.chop(1);
+
         SetText(input_number_);
     }
 }
@@ -194,7 +212,7 @@ QString MainWindow::RemoveTrailingZeroes(const QString& text) const {
 }
 
 QString MainWindow::NormalizeNumber(const QString& text) const {
-    if (text.isEmpty()) {
+    if (text.isEmpty() || text == "-0" || text == "-") {
         return "0";
     }
     if (text.startsWith('.')) {
@@ -208,6 +226,7 @@ QString MainWindow::NormalizeNumber(const QString& text) const {
     if (text.startsWith('0') && !text.startsWith("0.")) {
         return NormalizeNumber(RemoveTrailingZeroes(text));
     }
+
     return text;
 }
 
