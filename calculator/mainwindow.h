@@ -1,8 +1,8 @@
 #pragma once
 
-#include "calculator.h"
-
 #include <QMainWindow>
+
+#include "calculator.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
